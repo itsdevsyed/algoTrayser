@@ -1,6 +1,6 @@
-// src/components/visualizers/patterns/TwoSumVisualizer.tsx
 'use client';
 
+import React from 'react';
 import { Step } from '../../../types';
 import { ArrayVisualizer } from '../../visualization/ArrayVisualizer';
 import { HashMapVisualizer } from '../../visualization/HashMapVisualizer';
@@ -11,15 +11,20 @@ interface TwoSumVisualizerProps {
   target?: any;
 }
 
-export const TwoSumVisualizer: React.FC<TwoSumVisualizerProps> = ({ step, input, target }) => {
+export const TwoSumVisualizer: React.FC<TwoSumVisualizerProps> = ({
+  step,
+  input,
+  target,
+}) => {
   if (!step) return null;
 
-  const highlightIndices = [];
-  if (step.type === 'match') {
-    highlightIndices.push(step.i, step.j);
-  }
+  const highlightIndices: number[] =
+    step.type === 'match'
+      ? [step.i, step.j].filter((value): value is number => value !== undefined)
+      : [];
 
-  const pointerIndices = step.i >= 0 && step.i < input.length ? [step.i] : [];
+  const pointerIndices: number[] =
+    step.i >= 0 && step.i < input.length ? [step.i] : [];
 
   return (
     <div className="space-y-10">
@@ -29,6 +34,7 @@ export const TwoSumVisualizer: React.FC<TwoSumVisualizerProps> = ({ step, input,
             <i className="fa-solid fa-list-ol text-indigo-500"></i> Input Array
           </span>
         </div>
+
         <ArrayVisualizer
           data={input}
           highlightIndices={highlightIndices}
@@ -41,6 +47,7 @@ export const TwoSumVisualizer: React.FC<TwoSumVisualizerProps> = ({ step, input,
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-800"></div>
         </div>
+
         <div className="relative bg-white dark:bg-[#0f172a] px-4 py-1 text-xs font-bold uppercase text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 rounded-full">
           Target ({target}) - Value ({step.value ?? '?'}) = Complement ({step.complement ?? '?'})
         </div>
@@ -52,8 +59,9 @@ export const TwoSumVisualizer: React.FC<TwoSumVisualizerProps> = ({ step, input,
             <i className="fa-solid fa-database text-sky-500"></i> Hash Map
           </span>
         </div>
+
         <HashMapVisualizer
-          mapState={step.mapState || {}}
+          mapState={step.mapState ?? {}}
           highlightKey={step.value}
           matchKey={step.complement}
         />

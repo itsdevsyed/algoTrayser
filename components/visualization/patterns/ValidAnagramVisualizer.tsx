@@ -3,6 +3,7 @@
 
 import { Step } from '@/types';
 import { HashMapVisualizer } from '@/components/visualization/HashMapVisualizer';
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from 'react';
 
 interface ValidAnagramVisualizerProps {
   step: Step | null;
@@ -40,7 +41,7 @@ export const ValidAnagramVisualizer = ({ step, input }: ValidAnagramVisualizerPr
             String 1 (s)
           </div>
           <div className="flex flex-wrap gap-2">
-            {s.split('').map((char, idx) => (
+            {s.split('').map((char: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: Key | null | undefined) => (
               <div
                 key={idx}
                 className={`
@@ -59,7 +60,7 @@ export const ValidAnagramVisualizer = ({ step, input }: ValidAnagramVisualizerPr
             String 2 (t)
           </div>
           <div className="flex flex-wrap gap-2">
-            {t.split('').map((char, idx) => (
+            {t.split('').map((char: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: Key | null | undefined) => (
               <div
                 key={idx}
                 className={`

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import blind75Data from "@/data/75-blind.json";
 import neetcode150Data from "@/data/neetcode-150.json";
@@ -9,7 +9,6 @@ import neetcode150Data from "@/data/neetcode-150.json";
 import StatsHeader from "../components/StatsHeader";
 import FilterBar from "../components/FilterBar";
 import ProblemCard from "../components/ProblemCard";
-import AddProblemModal from "../components/AddProblemModal";
 
 interface Problem {
   id: string;
@@ -22,7 +21,7 @@ interface Problem {
 
 type TabType = "all" | "blind75" | "neetcode150" | "custom";
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams();
 
   // State
@@ -32,7 +31,6 @@ export default function Home() {
   const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("cat") || "all");
 
   const [customProblems, setCustomProblems] = useState<Problem[]>([]);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const [newProblem, setNewProblem] = useState<Partial<Problem>>({
@@ -90,10 +88,6 @@ export default function Home() {
     // 3. Convert Map back to array and add custom problems
     const combinedUnique = Array.from(uniqueMap.values());
 
-    // Note: Custom problems are handled separately in the filter logic below
-    // because they don't have LeetCode numbers to dedupe against easily without more complex logic.
-    // For now, we'll just merge them at the end of the "all" list.
-
     return [...combinedUnique, ...custom];
   }, [customProblems]);
 
@@ -143,12 +137,9 @@ export default function Home() {
 
     setCustomProblems(prev => [...prev, problem]);
     setNewProblem({ title: "", difficulty: "Easy", category: "Arrays & Hashing", desc: "" });
-    setShowAddModal(false);
   };
 
-  const removeCustomProblem = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const removeCustomProblem = (id: string) => {
     setCustomProblems(prev => prev.filter(p => p.id !== id));
   };
 
@@ -190,9 +181,7 @@ export default function Home() {
               <ProblemCard
                 key={`${problem.source}-${problem.id}`}
                 problem={problem}
-                activeTab={activeTab}
-                onRemove={removeCustomProblem}
-              />
+                onRemove={problem.source === "custom" ? removeCustomProblem : undefined} activeTab={""}              />
             ))
           )}
         </div>
@@ -205,16 +194,16 @@ export default function Home() {
         </footer>
 
         {/* Modal Component */}
-        <AddProblemModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          newProblem={newProblem}
-          setNewProblem={setNewProblem}
-          onAdd={addCustomProblem}
-        />
+
       </div>
     </div>
   );
 }
 
-//
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-neutral-50 dark:bg-[#0a0a0a] flex items-center justify-center">Loading...</div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}

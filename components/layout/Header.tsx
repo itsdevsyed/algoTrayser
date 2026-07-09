@@ -21,11 +21,15 @@ export const Header: React.FC<HeaderProps> = ({ problem, onProblemChange }) => {
               {problem?.title || 'DSA Visualizer'}
             </h1>
             {problem && (
-              <span className={`text-[10px] uppercase tracking-widest font-bold ${
-                problem.difficulty === 'Easy' ? 'text-emerald-500' :
-                problem.difficulty === 'Medium' ? 'text-amber-500' : 'text-rose-500'
-              }`}>
-                {problem.difficulty} • {problem.pattern}
+              <span
+                className={`text-[10px] uppercase tracking-widest font-bold ${problem.difficulty === 'Easy'
+                    ? 'text-emerald-500'
+                    : problem.difficulty === 'Medium'
+                      ? 'text-amber-500'
+                      : 'text-rose-500'
+                  }`}
+              >
+                {problem.difficulty} • {problem.category}
               </span>
             )}
           </div>
