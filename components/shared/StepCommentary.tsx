@@ -1,8 +1,8 @@
-// src/components/shared/StepCommentary.tsx
 'use client';
 
 import React from 'react';
 import { Step } from '../../types';
+import { MessageCircle } from 'lucide-react';
 
 interface StepCommentaryProps {
   step: Step | null;
@@ -33,7 +33,7 @@ export const StepCommentary: React.FC<StepCommentaryProps> = ({ step, className 
       <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
         <div className="flex gap-3">
           <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
-            <i className="fa-solid fa-comment-dots"></i>
+            <MessageCircle className="w-4 h-4" />
           </div>
           <div>
             <h4 className="text-sm font-bold text-slate-800 dark:text-white">{step.title}</h4>

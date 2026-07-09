@@ -1,5 +1,5 @@
 // src/hooks/useVisualizer.ts
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Step } from '../types';
 
 export const useVisualizer = (
@@ -13,13 +13,34 @@ export const useVisualizer = (
   const [target, setTarget] = useState(initialTarget);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // ✅ Use ref to track if initial generation has happened
+  const hasInitialized = useRef(false);
+
   const generateSteps = useCallback((newInput: any, newTarget?: any) => {
-    const newSteps = tracerFn(newInput, newTarget);
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-    setIsPlaying(false);
-    return newSteps;
+    try {
+      const newSteps = tracerFn(newInput, newTarget);
+      setSteps(newSteps);
+      setCurrentStepIndex(0);
+      setIsPlaying(false);
+      return newSteps;
+    } catch (error) {
+      console.error('Error generating steps:', error);
+      // ✅ Return empty steps or fallback
+      setSteps([]);
+      setCurrentStepIndex(0);
+      return [];
+    }
   }, [tracerFn]);
+
+  // ✅ Auto-generate steps on initial mount if tracer and input available
+  useEffect(() => {
+    if (!hasInitialized.current && tracerFn) {
+      const initialSteps = tracerFn(initialInput, initialTarget);
+      setSteps(initialSteps);
+      setCurrentStepIndex(0);
+      hasInitialized.current = true;
+    }
+  }, [tracerFn, initialInput, initialTarget]);
 
   const currentStep = useMemo(() => {
     return steps[currentStepIndex] || null;

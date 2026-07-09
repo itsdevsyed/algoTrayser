@@ -1,7 +1,14 @@
-// src/components/shared/PlaybackControls.tsx
 'use client';
 
 import React from 'react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  RotateCcw,
+  Gauge
+} from 'lucide-react';
 
 interface PlaybackControlsProps {
   onPrev: () => void;
@@ -37,7 +44,7 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
           title="Step Backward"
           disabled={currentStep <= 0}
         >
-          <i className="fa-solid fa-chevron-left"></i>
+          <ChevronLeft className="w-4 h-4" />
         </button>
         <button
           onClick={onPlay}
@@ -48,8 +55,17 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
           }`}
           title={isPlaying ? "Pause" : "Auto Play"}
         >
-          <i className={`fa-solid ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
-          <span>{isPlaying ? 'Pause' : 'Play'}</span>
+          {isPlaying ? (
+            <>
+              <Pause className="w-4 h-4" />
+              <span>Pause</span>
+            </>
+          ) : (
+            <>
+              <Play className="w-4 h-4" />
+              <span>Play</span>
+            </>
+          )}
         </button>
         <button
           onClick={onNext}
@@ -57,20 +73,20 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
           title="Step Forward"
           disabled={currentStep >= totalSteps - 1}
         >
-          <i className="fa-solid fa-chevron-right"></i>
+          <ChevronRight className="w-4 h-4" />
         </button>
         <button
           onClick={onReset}
           className="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200"
           title="Reset Simulation"
         >
-          <i className="fa-solid fa-rotate-left"></i>
+          <RotateCcw className="w-4 h-4" />
         </button>
       </div>
 
       <div className="flex items-center gap-3 w-full sm:w-auto">
-        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
-          <i className="fa-solid fa-gauge-high"></i> Speed:
+        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap flex items-center gap-1">
+          <Gauge className="w-3 h-3" /> Speed:
         </span>
         <input
           type="range"

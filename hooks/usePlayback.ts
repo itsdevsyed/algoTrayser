@@ -20,11 +20,16 @@ export const usePlayback = ({
 }: UsePlaybackProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const stopPlay = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
     setIsPlaying(false);
   }, []);
@@ -32,6 +37,11 @@ export const usePlayback = ({
   const startPlay = useCallback(() => {
     if (isEnd) {
       onReset();
+      // ✅ Small delay to allow reset before starting
+      timeoutRef.current = setTimeout(() => {
+        setIsPlaying(true);
+      }, 100);
+      return;
     }
     setIsPlaying(true);
   }, [isEnd, onReset]);
@@ -43,6 +53,18 @@ export const usePlayback = ({
       startPlay();
     }
   }, [isPlaying, stopPlay, startPlay]);
+
+  // ✅ Clean up all intervals on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isPlaying) {
@@ -56,10 +78,12 @@ export const usePlayback = ({
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   }, [isPlaying, onNext, speed, stopPlay]);
 
+  // ✅ Handle end of playback
   useEffect(() => {
     if (isEnd && isPlaying) {
       stopPlay();

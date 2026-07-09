@@ -1,14 +1,18 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import blind75Data from "@/data/75-blind.json";
 import neetcode150Data from "@/data/neetcode-150.json";
 
-// Import our new components
+// Import our components
 import StatsHeader from "../components/StatsHeader";
 import FilterBar from "../components/FilterBar";
 import ProblemCard from "../components/ProblemCard";
+import AddProblemModal from "../components/AddProblemModal";
+
+// ✅ Import Plus icon for the button
+import { Plus } from "lucide-react";
 
 interface Problem {
   id: string;
@@ -16,13 +20,14 @@ interface Problem {
   difficulty: "Easy" | "Medium" | "Hard";
   category: string;
   desc: string;
-  source?: "blind75" | "neetcode150" | "custom";
+  source?: "blind75" | "neetcode150" | "custom" | "both";
 }
 
 type TabType = "all" | "blind75" | "neetcode150" | "custom";
 
 function HomeContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // State
   const [activeTab, setActiveTab] = useState<TabType>((searchParams.get("tab") as TabType) || "all");
@@ -31,6 +36,7 @@ function HomeContent() {
   const [categoryFilter, setCategoryFilter] = useState<string>(searchParams.get("cat") || "all");
 
   const [customProblems, setCustomProblems] = useState<Problem[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const [newProblem, setNewProblem] = useState<Partial<Problem>>({
@@ -40,19 +46,46 @@ function HomeContent() {
     desc: "",
   });
 
-  // Load custom problems
+  // Load custom problems with error handling
   useEffect(() => {
-    const saved = localStorage.getItem("customProblems");
-    if (saved) setCustomProblems(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem("customProblems");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setCustomProblems(Array.isArray(parsed) ? parsed : []);
+      }
+    } catch (error) {
+      console.error("Error loading custom problems:", error);
+      setCustomProblems([]);
+    }
+
+    // Check system dark mode preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setIsDarkMode(true);
     }
   }, []);
 
-  // Save custom problems
+  // Save custom problems with error handling
   useEffect(() => {
-    localStorage.setItem("customProblems", JSON.stringify(customProblems));
+    try {
+      localStorage.setItem("customProblems", JSON.stringify(customProblems));
+    } catch (error) {
+      console.error("Error saving custom problems:", error);
+    }
   }, [customProblems]);
+
+  // Sync URL params when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (activeTab !== "all") params.set("tab", activeTab);
+    if (searchQuery) params.set("q", searchQuery);
+    if (difficultyFilter !== "all") params.set("diff", difficultyFilter);
+    if (categoryFilter !== "all") params.set("cat", categoryFilter);
+
+    const queryString = params.toString();
+    const url = queryString ? `/?${queryString}` : "/";
+    router.replace(url, { scroll: false });
+  }, [activeTab, searchQuery, difficultyFilter, categoryFilter, router]);
 
   // Helper to extract LeetCode number from title (e.g., "1. Two Sum" -> "1")
   const getProblemNumber = (title: string) => {
@@ -66,27 +99,32 @@ function HomeContent() {
     const b75 = blind75Data.map((p: any) => ({ ...p, source: "blind75" as const }));
     const custom = customProblems.map((p: any) => ({ ...p, source: "custom" as const }));
 
-    // Deduplication Logic for "All" tab:
-    // We use a Map to ensure unique problems based on their LeetCode number.
-    // Priority: NeetCode 150 > Blind 75 (since N150 usually has better descriptions/categories)
-    const uniqueMap = new Map<string, Problem>();
+    const uniqueMap = new Map<string, { problem: Problem; sources: string[] }>();
 
-    // 1. Add Blind 75 first
     b75.forEach((p: Problem) => {
       const num = getProblemNumber(p.title);
       if (!uniqueMap.has(num)) {
-        uniqueMap.set(num, p);
+        uniqueMap.set(num, { problem: p, sources: ["blind75"] });
+      } else {
+        uniqueMap.get(num)!.sources.push("blind75");
       }
     });
 
-    // 2. Add NeetCode 150 (overwrites Blind 75 if duplicate, giving N150 priority)
     n150.forEach((p: Problem) => {
       const num = getProblemNumber(p.title);
-      uniqueMap.set(num, p);
+      if (!uniqueMap.has(num)) {
+        uniqueMap.set(num, { problem: p, sources: ["neetcode150"] });
+      } else {
+        uniqueMap.get(num)!.sources.push("neetcode150");
+      }
     });
 
-    // 3. Convert Map back to array and add custom problems
-    const combinedUnique = Array.from(uniqueMap.values());
+    const combinedUnique = Array.from(uniqueMap.values()).map(({ problem, sources }) => {
+      if (sources.length > 1) {
+        return { ...problem, source: "both" as const };
+      }
+      return problem;
+    });
 
     return [...combinedUnique, ...custom];
   }, [customProblems]);
@@ -137,6 +175,7 @@ function HomeContent() {
 
     setCustomProblems(prev => [...prev, problem]);
     setNewProblem({ title: "", difficulty: "Easy", category: "Arrays & Hashing", desc: "" });
+    setShowAddModal(false);
   };
 
   const removeCustomProblem = (id: string) => {
@@ -145,24 +184,47 @@ function HomeContent() {
 
   return (
     <div className={`${isDarkMode ? "dark" : ""} min-h-screen bg-neutral-50 dark:bg-[#0a0a0a] text-neutral-900 dark:text-neutral-100 transition-colors duration-300`}>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
-        {/* Header Component */}
+        {/* Stats Header - Full Width */}
         <StatsHeader isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
 
-        {/* Filter Bar Component */}
-        <FilterBar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          difficultyFilter={difficultyFilter}
-          setDifficultyFilter={setDifficultyFilter}
-          categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
-          availableCategories={availableCategories}
-          totalProblems={filteredProblems.length}
-        />
+        {/* Filter Bar - Sticky with proper spacing (NO Add Problem button here) */}
+        <div className="sticky top-0 z-30 -mx-4 px-4 sm:mx-0 sm:px-0 bg-neutral-50/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md py-4 border-b border-neutral-200/50 dark:border-neutral-800/50">
+          <FilterBar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            difficultyFilter={difficultyFilter}
+            setDifficultyFilter={setDifficultyFilter}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
+            availableCategories={availableCategories}
+            totalProblems={filteredProblems.length}
+            // ❌ REMOVED onAddProblem from here
+          />
+        </div>
+
+        {/* Stats Row with Add Problem Button */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="flex items-center gap-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
+            {activeTab === "custom" && (
+              <span className="text-indigo-500 dark:text-indigo-400">
+                • {filteredProblems.length} in your custom list
+              </span>
+            )}
+          </div>
+
+          {/* ✅ Add Problem Button - Now below the stats */}
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-lg shadow-indigo-500/20 transition-all whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            Add Problem
+          </button>
+        </div>
 
         {/* Problem List */}
         <div className="mt-6 space-y-3">
@@ -179,9 +241,11 @@ function HomeContent() {
           ) : (
             filteredProblems.map((problem: Problem) => (
               <ProblemCard
-                key={`${problem.source}-${problem.id}`}
+                key={`${problem.source || 'unknown'}-${problem.id}`}
                 problem={problem}
-                onRemove={problem.source === "custom" ? removeCustomProblem : undefined} activeTab={""}              />
+                activeTab={activeTab}
+                onRemove={problem.source === "custom" ? removeCustomProblem : undefined}
+              />
             ))
           )}
         </div>
@@ -193,7 +257,14 @@ function HomeContent() {
           </p>
         </footer>
 
-        {/* Modal Component */}
+        {/* Add Problem Modal */}
+        <AddProblemModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          newProblem={newProblem}
+          setNewProblem={setNewProblem}
+          onAdd={addCustomProblem}
+        />
 
       </div>
     </div>
@@ -202,7 +273,14 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-neutral-50 dark:bg-[#0a0a0a] flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-neutral-50 dark:bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">Loading problems...</p>
+        </div>
+      </div>
+    }>
       <HomeContent />
     </Suspense>
   );

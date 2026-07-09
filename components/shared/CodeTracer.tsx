@@ -1,4 +1,3 @@
-// src/components/shared/CodeTracer.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -26,6 +25,22 @@ export const CodeTracer: React.FC<CodeTracerProps> = ({
   };
 
   const currentCode = languageMap[language];
+
+  // ✅ Safety check: if snippets are missing
+  if (!snippets || !snippets.js) {
+    return (
+      <div className={`bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-xl transition-colors ${className}`}>
+        <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Code Tracer
+          </span>
+        </div>
+        <div className="p-4 text-center text-sm text-slate-500 dark:text-slate-400">
+          No code snippets available for this problem.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-xl transition-colors ${className}`}>

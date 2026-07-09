@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Filter, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, Plus } from "lucide-react";
 
 type TabType = "all" | "blind75" | "neetcode150" | "custom";
 
@@ -15,6 +15,7 @@ interface FilterBarProps {
   setCategoryFilter: (c: string) => void;
   availableCategories: string[];
   totalProblems: number;
+  onAddProblem?: () => void;
 }
 
 export default function FilterBar({
@@ -28,13 +29,14 @@ export default function FilterBar({
   setCategoryFilter,
   availableCategories,
   totalProblems,
+  onAddProblem,
 }: FilterBarProps) {
   return (
     <div className="sticky top-4 z-30 bg-neutral-50/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-transparent sm:border-none">
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
 
         {/* Tabs */}
-        <div className="flex p-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-x-auto no-scrollbar shadow-sm">
+        <div className="flex p-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-x-auto [&::-webkit-scrollbar]:hidden scrollbar-hide shadow-sm">
           {(["all", "blind75", "neetcode150", "custom"] as TabType[]).map((tab) => (
             <button
               key={tab}
@@ -60,13 +62,13 @@ export default function FilterBar({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search..."
+              placeholder="Search problems..."
               className="w-full pl-9 pr-8 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
               >
                 ✕
               </button>
@@ -98,14 +100,30 @@ export default function FilterBar({
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
-            <Filter className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
           </div>
+
+          {/* Add Problem Button */}
+          {onAddProblem && (
+            <button
+              onClick={onAddProblem}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-lg shadow-indigo-500/20 transition-all whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              Add Problem
+            </button>
+          )}
         </div>
       </div>
 
       {/* Stats Row */}
       <div className="mt-4 flex items-center gap-4 text-xs font-medium text-neutral-500 dark:text-neutral-400">
         <span>{totalProblems} problems found</span>
+        {activeTab === "custom" && (
+          <span className="text-indigo-500 dark:text-indigo-400">
+            • {totalProblems} in your custom list
+          </span>
+        )}
       </div>
     </div>
   );

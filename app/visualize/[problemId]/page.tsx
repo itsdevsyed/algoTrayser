@@ -1,4 +1,3 @@
-// app/visualize/[problemId]/page.tsx
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -26,6 +25,9 @@ import { validAnagramCodeSnippets } from '@/utils/codeSnippets/validAnagram';
 
 import { getProblemPattern } from '@/utils/patternMapper';
 
+// ✅ Import Lucide icons instead of Font Awesome
+import { ArrowLeft, RotateCw, ChevronLeft, ChevronRight, Play, Pause, RotateCcw, Sliders, Dice1, Gauge, CircleX, MessageCircle, ChartLine, Repeat } from 'lucide-react';
+
 interface Problem {
   id: string;
   title: string;
@@ -47,7 +49,6 @@ const patternCodeSnippets: Record<string, any> = {
 
 export default function VisualizeProblemPage() {
   const params = useParams();
-  const router = useRouter();
   const problemId = params.problemId as string;
 
   const { theme } = useTheme();
@@ -58,11 +59,28 @@ export default function VisualizeProblemPage() {
   const [speed, setSpeed] = useState(1200);
   const [problem, setProblem] = useState<Problem | null>(null);
 
+  // ✅ Load problem from both JSON and localStorage custom problems
   useEffect(() => {
     const allProblems = [...blind75Data, ...neetcode150Data];
-    const foundProblem = allProblems.find((p: any) => p.id === problemId);
+
+    // Check if it's a custom problem (starts with "custom-")
+    let foundProblem = allProblems.find((p: any) => p.id === problemId) as Problem | undefined;
+
+    if (!foundProblem && problemId.startsWith('custom-')) {
+      // Load custom problems from localStorage
+      try {
+        const saved = localStorage.getItem('customProblems');
+        if (saved) {
+          const customProblems = JSON.parse(saved);
+          foundProblem = customProblems.find((p: any) => p.id === problemId);
+        }
+      } catch (error) {
+        console.error('Error loading custom problem:', error);
+      }
+    }
+
     if (foundProblem) {
-      setProblem(foundProblem as Problem);
+      setProblem(foundProblem);
     }
   }, [problemId]);
 
@@ -112,6 +130,11 @@ export default function VisualizeProblemPage() {
     }
   }, [pattern]);
 
+  // ✅ Reset validation error when input changes
+  useEffect(() => {
+    setValidationError(null);
+  }, [inputStr, targetStr]);
+
   if (!problem) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
@@ -124,7 +147,7 @@ export default function VisualizeProblemPage() {
             The problem you're looking for doesn't exist in our database.
           </p>
           <Link href="/" className="px-5 py-2.5 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors font-medium text-sm flex items-center justify-center gap-2">
-            <i className="fa-solid fa-arrow-left"></i> Back to Problems
+            <ArrowLeft className="w-4 h-4" /> Back to Problems
           </Link>
         </div>
       </div>
@@ -143,7 +166,7 @@ export default function VisualizeProblemPage() {
             The visualizer for <strong className="text-slate-700 dark:text-slate-300">{problem.title}</strong> is currently being built.
           </p>
           <Link href="/" className="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-medium text-sm flex items-center justify-center gap-2">
-            <i className="fa-solid fa-arrow-left"></i> Back to Problems
+            <ArrowLeft className="w-4 h-4" /> Back to Problems
           </Link>
         </div>
       </div>
@@ -153,32 +176,38 @@ export default function VisualizeProblemPage() {
   const VisualizerComponent = patternVisualizers[pattern.pattern] || TwoSumVisualizer;
   const CodeSnippets = patternCodeSnippets[pattern.pattern] || twoSumCodeSnippets;
 
-  // ✅ FIXED: handleApply with proper string handling
   const handleApply = () => {
     let input: any;
     let target: number | undefined;
 
-    if (pattern.config.inputType === 'string') {
-      // Split by comma and trim
-      const parts = inputStr.split(',').map(s => s.trim());
+    // ✅ FIXED: Better input validation and parsing
+    if (pattern.config.inputType === 'array') {
+      // Remove any brackets, trim, and split
+      const cleanedInput = inputStr.replace(/[\[\]]/g, '').trim();
 
-      // If there are 2 parts, use as [s, t] for anagram
-      if (parts.length === 2 && parts[0] && parts[1]) {
-        input = parts;
-      }
-      // If single string, use as is
-      else if (parts.length === 1 && parts[0]) {
-        input = parts[0];
-      }
-      else {
-        setValidationError('Please enter valid strings (e.g., "anagram, nagaram")');
+      // Handle empty input
+      if (!cleanedInput) {
+        setValidationError('Please enter at least 2 numbers (e.g., "2, 7, 11, 15")');
         return;
       }
+
+      const parts = cleanedInput.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
+
+      if (parts.length < 2) {
+        setValidationError('Please enter at least 2 numbers (e.g., "2, 7, 11, 15")');
+        return;
+      }
+
+      input = parts;
     }
-    else if (pattern.config.inputType === 'array') {
-      input = inputStr.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x));
-      if (input.length === 0) {
-        setValidationError('Please enter valid numbers');
+    else if (pattern.config.inputType === 'string') {
+      const parts = inputStr.split(',').map(s => s.trim());
+      if (parts.length === 2 && parts[0] && parts[1]) {
+        input = parts;
+      } else if (parts.length === 1 && parts[0]) {
+        input = parts[0];
+      } else {
+        setValidationError('Please enter valid strings (e.g., "anagram, nagaram")');
         return;
       }
     }
@@ -257,7 +286,7 @@ export default function VisualizeProblemPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Link href="/" className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-              <i className="fa-solid fa-arrow-left text-sm"></i>
+              <ArrowLeft className="w-4 h-4" />
             </Link>
             <div className="flex items-center gap-2 min-w-0">
               <h1 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white truncate">
@@ -270,7 +299,7 @@ export default function VisualizeProblemPage() {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={visualizer.reset} className="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-              <i className="fa-solid fa-rotate-left"></i>
+              <RotateCw className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -330,7 +359,7 @@ export default function VisualizeProblemPage() {
             <ConfigPanel
               inputLabel={`Input (${pattern.config.inputType}):`}
               inputPlaceholder={
-                pattern.config.inputType === 'array' ? '1, 2, 3, 4' :
+                pattern.config.inputType === 'array' ? '2, 7, 11, 15' :
                 pattern.config.inputType === 'string' ? 'anagram, nagaram' :
                 pattern.config.inputType === 'number' ? '5' : 'Enter input'
               }

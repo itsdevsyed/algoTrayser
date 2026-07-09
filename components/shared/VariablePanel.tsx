@@ -1,8 +1,8 @@
-// src/components/shared/VariablePanel.tsx
 'use client';
 
 import React from 'react';
 import { Step } from '../../types';
+import { ChartLine } from 'lucide-react';
 
 interface VariablePanelProps {
   step: Step | null;
@@ -34,7 +34,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     <div className={`bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-xl transition-colors ${className}`}>
       <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 flex items-center justify-between">
         <span>Current Variables</span>
-        <i className="fa-solid fa-chart-simple text-sky-500"></i>
+        <ChartLine className="w-4 h-4 text-sky-500" />
       </h3>
 
       <div className="space-y-3">

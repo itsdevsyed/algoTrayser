@@ -16,7 +16,7 @@ export default function StatsHeader({ isDarkMode, setIsDarkMode }: StatsHeaderPr
             <Code2 className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            AlgoPlayer
+            AlgoTrayser
           </h1>
         </div>
         <p className="text-neutral-500 dark:text-neutral-400 text-sm max-w-md">
@@ -27,6 +27,7 @@ export default function StatsHeader({ isDarkMode, setIsDarkMode }: StatsHeaderPr
       <button
         onClick={() => setIsDarkMode(!isDarkMode)}
         className="self-start sm:self-auto p-2 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm"
+        aria-label="Toggle dark mode"
       >
         {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
       </button>

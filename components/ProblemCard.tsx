@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Play, X } from 'lucide-react';
 
 interface Problem {
   id: string;
@@ -9,13 +10,13 @@ interface Problem {
   difficulty: 'Easy' | 'Medium' | 'Hard';
   category: string;
   desc: string;
-  source?: 'blind75' | 'neetcode150' | 'custom';
+  source?: 'blind75' | 'neetcode150' | 'custom' | 'both';
 }
 
 interface ProblemCardProps {
   problem: Problem;
   activeTab: string;
-  onRemove?: (id: string, e: React.MouseEvent) => void;
+  onRemove?: (id: string) => void;  // ✅ Fixed: removed event parameter
 }
 
 export default function ProblemCard({ problem, activeTab, onRemove }: ProblemCardProps) {
@@ -23,6 +24,13 @@ export default function ProblemCard({ problem, activeTab, onRemove }: ProblemCar
     Easy: 'text-emerald-500 bg-emerald-500/10',
     Medium: 'text-amber-500 bg-amber-500/10',
     Hard: 'text-rose-500 bg-rose-500/10',
+  };
+
+  // ✅ Handle removal without event
+  const handleRemove = () => {
+    if (onRemove) {
+      onRemove(problem.id);
+    }
   };
 
   return (
@@ -39,6 +47,12 @@ export default function ProblemCard({ problem, activeTab, onRemove }: ProblemCar
             <span className="text-[10px] text-neutral-400 dark:text-neutral-500 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full">
               {problem.category}
             </span>
+            {/* ✅ Show source badge for "both" */}
+            {problem.source === 'both' && (
+              <span className="text-[10px] text-purple-400 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                Both
+              </span>
+            )}
           </div>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2">
             {problem.desc}
@@ -51,15 +65,15 @@ export default function ProblemCard({ problem, activeTab, onRemove }: ProblemCar
             href={`/visualize/${problem.id}`}
             className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 hover:bg-sky-500/20 transition-all border border-sky-500/20 flex items-center gap-1.5 whitespace-nowrap"
           >
-            <i className="fa-solid fa-play text-[10px]"></i> Visualize
+            <Play className="w-3 h-3" /> Visualize
           </Link>
 
           {activeTab === 'custom' && onRemove && (
             <button
-              onClick={(e) => onRemove(problem.id, e)}
+              onClick={handleRemove}
               className="text-xs text-neutral-400 hover:text-rose-500 transition-colors p-1.5 rounded-lg hover:bg-rose-500/10"
             >
-              <i className="fa-solid fa-xmark"></i>
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>

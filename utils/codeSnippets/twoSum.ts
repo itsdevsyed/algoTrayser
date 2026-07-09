@@ -1,4 +1,3 @@
-// src/utils/codeSnippets/twoSum.ts
 import { CodeSnippet } from '../../types';
 
 export const twoSumCodeSnippets: CodeSnippet = {
