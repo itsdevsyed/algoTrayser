@@ -1,0 +1,107 @@
+{
+  "id": "two-sum",
+  "title": "Two Sum",
+  "difficulty": "Easy",
+  "optimal": {
+    "language": "javascript",
+    "code": "function twoSum(nums, target) {\n  const map = new Map();\n  for (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    if (map.has(complement)) {\n      return [map.get(complement), i];\n    }\n    map.set(nums[i], i);\n  }\n}",
+    "steps": [
+      {
+        "line": 3,
+        "pointers": { "i": 0 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [0],
+        "hashmap": {},
+        "explanation": "Target is 21. Checking index 0 (Value: 3). Complement needed: 21 - 3 = 18. Map is empty, so 18 is not found."
+      },
+      {
+        "line": 8,
+        "pointers": { "i": 0 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [0],
+        "hashmap": { "3": 0 },
+        "explanation": "Storing value 3 with its index 0 into the HashMap. Advancing loop pointer."
+      },
+      {
+        "line": 3,
+        "pointers": { "i": 1 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [1],
+        "hashmap": { "3": 0 },
+        "explanation": "Checking index 1 (Value: 5). Complement needed: 21 - 5 = 16. Looked up 16 in HashMap, but it's not present."
+      },
+      {
+        "line": 8,
+        "pointers": { "i": 1 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [1],
+        "hashmap": { "3": 0, "5": 1 },
+        "explanation": "Storing value 5 with its index 1 into the HashMap. Advancing loop pointer."
+      },
+      {
+        "line": 3,
+        "pointers": { "i": 2 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [2],
+        "hashmap": { "3": 0, "5": 1 },
+        "explanation": "Checking index 2 (Value: 8). Complement needed: 21 - 8 = 13. HashMap does not contain 13."
+      },
+      {
+        "line": 8,
+        "pointers": { "i": 2 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [2],
+        "hashmap": { "3": 0, "5": 1, "8": 2 },
+        "explanation": "Storing value 8 with its index 2 into the HashMap. Advancing loop pointer."
+      },
+      {
+        "line": 3,
+        "pointers": { "i": 3 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [3],
+        "hashmap": { "3": 0, "5": 1, "8": 2 },
+        "explanation": "Checking index 3 (Value: 11). Complement needed: 21 - 11 = 10. HashMap lookup for 10 failed."
+      },
+      {
+        "line": 8,
+        "pointers": { "i": 3 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [3],
+        "hashmap": { "3": 0, "5": 1, "8": 2, "11": 3 },
+        "explanation": "Storing value 11 with its index 3 into the HashMap. Advancing loop pointer."
+      },
+      {
+        "line": 3,
+        "pointers": { "i": 4 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [4],
+        "hashmap": { "3": 0, "5": 1, "8": 2, "11": 3 },
+        "explanation": "Checking index 4 (Value: 7). Complement needed: 21 - 7 = 14. 14 is not in the map yet."
+      },
+      {
+        "line": 8,
+        "pointers": { "i": 4 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [4],
+        "hashmap": { "3": 0, "5": 1, "8": 2, "11": 3, "7": 4 },
+        "explanation": "Storing value 7 with its index 4 into the HashMap. Advancing loop pointer."
+      },
+      {
+        "line": 3,
+        "pointers": { "i": 5 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [5],
+        "hashmap": { "3": 0, "5": 1, "8": 2, "11": 3, "7": 4 },
+        "explanation": "Checking index 5 (Value: 14). Complement needed: 21 - 14 = 7. Let's scan the HashMap..."
+      },
+      {
+        "line": 5,
+        "pointers": { "i": 5 },
+        "arrayState": [3, 5, 8, 11, 7, 14],
+        "highlights": [4, 5],
+        "hashmap": { "3": 0, "5": 1, "8": 2, "11": 3, "7": 4 },
+        "explanation": "Match found! The complement '7' exists in our HashMap at index 4. Returning current index 5 and stored index 4: [4, 5]."
+      }
+    ]
+  }
+}

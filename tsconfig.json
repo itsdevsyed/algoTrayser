@@ -19,7 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"]  // ✅ This is correct for your structure (no src folder)
     }
   },
   "include": [

@@ -1,0 +1,46 @@
+// src/utils/codeSnippets/twoSum.ts
+import { CodeSnippet } from '../../types';
+
+export const twoSumCodeSnippets: CodeSnippet = {
+  js: [
+    '<span class="text-pink-600 dark:text-pink-400">function</span> <span class="text-yellow-400 dark:text-yellow-300 font-semibold">twoSum</span>(<span class="text-blue-400">nums</span>, <span class="text-blue-400">target</span>) <span class="text-pink-600 dark:text-pink-400">{</span>',
+    '  <span class="text-green-500 dark:text-green-400">// Create map: key=value, value=index</span>',
+    '  <span class="text-pink-600 dark:text-pink-400">const</span> <span class="text-yellow-400">seen</span> <span class="text-pink-600 dark:text-pink-400">=</span> <span class="text-pink-600 dark:text-pink-400">new</span> <span class="text-blue-400">Map</span>();',
+    '  <span class="text-pink-600 dark:text-pink-400">for</span> (<span class="text-pink-600 dark:text-pink-400">let</span> <span class="text-yellow-400">i</span> <span class="text-pink-600 dark:text-pink-400">=</span> <span class="text-orange-400">0</span>; i <span class="text-pink-600 dark:text-pink-400">&lt;</span> nums.<span class="text-blue-400">length</span>; i<span class="text-pink-600 dark:text-pink-400">++</span>) <span class="text-pink-600 dark:text-pink-400">{</span>',
+    '    <span class="text-pink-600 dark:text-pink-400">const</span> <span class="text-yellow-400">x</span> <span class="text-pink-600 dark:text-pink-400">=</span> nums[i];',
+    '    <span class="text-pink-600 dark:text-pink-400">const</span> <span class="text-yellow-400">complement</span> <span class="text-pink-600 dark:text-pink-400">=</span> target <span class="text-pink-600 dark:text-pink-400">-</span> x;',
+    '    <span class="text-pink-600 dark:text-pink-400">if</span> (seen.<span class="text-blue-400">has</span>(complement)) <span class="text-pink-600 dark:text-pink-400">{</span>',
+    '      <span class="text-pink-600 dark:text-pink-400">return</span> [seen.<span class="text-blue-400">get</span>(complement), i];',
+    '    <span class="text-pink-600 dark:text-pink-400">}</span>',
+    '    seen.<span class="text-blue-400">set</span>(x, i);',
+    '  <span class="text-pink-600 dark:text-pink-400">}</span>',
+    '  <span class="text-pink-600 dark:text-pink-400">return</span> [];',
+    '<span class="text-pink-600 dark:text-pink-400">}</span>',
+  ],
+  py: [
+    '<span class="text-pink-600 dark:text-pink-400">def</span> <span class="text-yellow-400 dark:text-yellow-300 font-semibold">twoSum</span>(<span class="text-blue-400">nums</span>, <span class="text-blue-400">target</span>)<span class="text-pink-600 dark:text-pink-400">:</span>',
+    '    <span class="text-green-500 dark:text-green-400"># Dictionary to map value -> index</span>',
+    '    <span class="text-yellow-400">seen</span> <span class="text-pink-600 dark:text-pink-400">=</span> <span class="text-pink-600 dark:text-pink-400">{}</span>',
+    '    <span class="text-pink-600 dark:text-pink-400">for</span> <span class="text-yellow-400">i</span>, <span class="text-yellow-400">x</span> <span class="text-pink-600 dark:text-pink-400">in</span> <span class="text-blue-400">enumerate</span>(nums)<span class="text-pink-600 dark:text-pink-400">:</span>',
+    '        <span class="text-yellow-400">complement</span> <span class="text-pink-600 dark:text-pink-400">=</span> target <span class="text-pink-600 dark:text-pink-400">-</span> x',
+    '        <span class="text-pink-600 dark:text-pink-400">if</span> complement <span class="text-pink-600 dark:text-pink-400">in</span> seen<span class="text-pink-600 dark:text-pink-400">:</span>',
+    '            <span class="text-pink-600 dark:text-pink-400">return</span> [seen[complement], i]',
+    '        seen[x] <span class="text-pink-600 dark:text-pink-400">=</span> i',
+    '    <span class="text-pink-600 dark:text-pink-400">return</span> []',
+  ],
+  java: [
+    '<span class="text-pink-600 dark:text-pink-400">public int</span>[] <span class="text-yellow-400 dark:text-yellow-300 font-semibold">twoSum</span>(<span class="text-pink-600 dark:text-pink-400">int</span>[] <span class="text-blue-400">nums</span>, <span class="text-pink-600 dark:text-pink-400">int</span> <span class="text-blue-400">target</span>) <span class="text-pink-600 dark:text-pink-400">{</span>',
+    '    <span class="text-green-500 dark:text-green-400">// Create map: key=value, value=index</span>',
+    '    <span class="text-blue-400">Map</span>&lt;<span class="text-blue-400">Integer</span>, <span class="text-blue-400">Integer</span>&gt; <span class="text-yellow-400">seen</span> <span class="text-pink-600 dark:text-pink-400">=</span> <span class="text-pink-600 dark:text-pink-400">new</span> <span class="text-blue-400">HashMap</span>&lt;&gt;();',
+    '    <span class="text-pink-600 dark:text-pink-400">for</span> (<span class="text-pink-600 dark:text-pink-400">int</span> <span class="text-yellow-400">i</span> <span class="text-pink-600 dark:text-pink-400">=</span> <span class="text-orange-400">0</span>; i <span class="text-pink-600 dark:text-pink-400">&lt;</span> nums.<span class="text-blue-400">length</span>; i<span class="text-pink-600 dark:text-pink-400">++</span>) <span class="text-pink-600 dark:text-pink-400">{</span>',
+    '        <span class="text-pink-600 dark:text-pink-400">int</span> <span class="text-yellow-400">x</span> <span class="text-pink-600 dark:text-pink-400">=</span> nums[i];',
+    '        <span class="text-pink-600 dark:text-pink-400">int</span> <span class="text-yellow-400">complement</span> <span class="text-pink-600 dark:text-pink-400">=</span> target <span class="text-pink-600 dark:text-pink-400">-</span> x;',
+    '        <span class="text-pink-600 dark:text-pink-400">if</span> (seen.<span class="text-blue-400">containsKey</span>(complement)) <span class="text-pink-600 dark:text-pink-400">{</span>',
+    '            <span class="text-pink-600 dark:text-pink-400">return new int</span>[] <span class="text-pink-600 dark:text-pink-400">{</span> seen.<span class="text-blue-400">get</span>(complement), i <span class="text-pink-600 dark:text-pink-400">}</span>;',
+    '        <span class="text-pink-600 dark:text-pink-400">}</span>',
+    '        seen.<span class="text-blue-400">put</span>(x, i);',
+    '    <span class="text-pink-600 dark:text-pink-400">}</span>',
+    '    <span class="text-pink-600 dark:text-pink-400">return new int</span>[] <span class="text-pink-600 dark:text-pink-400">{}</span>;',
+    '<span class="text-pink-600 dark:text-pink-400">}</span>',
+  ],
+};
